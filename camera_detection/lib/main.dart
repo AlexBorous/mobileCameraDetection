@@ -35,7 +35,7 @@ class _CameraAppState extends State<CameraApp> {
   void initState() {
     super.initState();
 
-    _textEditingController = TextEditingController();
+    _textEditingController = TextEditingController(text: url);
   }
 
   @override
@@ -93,11 +93,23 @@ class _CameraAppState extends State<CameraApp> {
       applicationLegalese: "By Alex Borousas",
       applicationVersion: "1.0",
       children: <Widget>[
-        TextField(
-          controller: _textEditingController,
-          onSubmitted: (str) {
-            url = str;
-          },
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text("POST url:"),
+            const SizedBox(
+              width: 20.0,
+            ),
+            Flexible(
+              child: TextField(
+                textAlign: TextAlign.center,
+                controller: _textEditingController,
+                onSubmitted: (str) {
+                  url = str;
+                },
+              ),
+            ),
+          ],
         ),
       ],
     );
