@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Realtime Detection',
       debugShowCheckedModeBanner: false,
       theme: ThemeData.dark(),
       home: CameraApp(),
@@ -50,7 +50,7 @@ class _CameraAppState extends State<CameraApp> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Object Detector App"),
+        title: Text("Car Detector App"),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.info),
@@ -66,7 +66,7 @@ class _CameraAppState extends State<CameraApp> {
               ButtonTheme(
                 minWidth: 160,
                 child: ElevatedButton(
-                  child: Text("Real Time Detection"),
+                  child: Text("Start Detection"),
                   onPressed: () {
                     Navigator.push(
                       context,

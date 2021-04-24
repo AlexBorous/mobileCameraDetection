@@ -24,10 +24,10 @@ class _CameraFeedState extends State<CameraFeed> {
   void initState() {
     super.initState();
     print(widget.cameras);
-    if (widget.cameras == null || widget.cameras.length < 1) {
+    if (widget.cameras.length < 1) {
       print('No Cameras Found.');
     } else {
-      controller = new CameraController(
+      controller = CameraController(
         widget.cameras[0],
         ResolutionPreset.high,
       );
@@ -53,6 +53,11 @@ class _CameraFeedState extends State<CameraFeed> {
               threshold: 0.4,
             ).then((recognitions) {
               widget.setRecognitions(recognitions!, img.height, img.width);
+              recognitions.forEach((element) {
+                if (element['confidenceInClass'] > 0.5 &&
+                    element['detectedClass'] == "car")
+                  print(element['detectedClass']);
+              });
               print(recognitions);
               isDetecting = false;
             });
@@ -60,6 +65,10 @@ class _CameraFeedState extends State<CameraFeed> {
         });
       });
     }
+  }
+
+  Future<void> initializeCameraController() async {
+    await controller.initialize();
   }
 
   @override
@@ -70,12 +79,35 @@ class _CameraFeedState extends State<CameraFeed> {
 
   @override
   Widget build(BuildContext context) {
-    if (controller == null || !controller.value.isInitialized) {
-      return Container(
-        color: Colors.red,
-      );
+    if (!controller.value.isInitialized) {
+      return Container();
     }
-
+    // return FutureBuilder(
+    //     future: initializeCameraController(),
+    //     builder: (BuildContext context, snapshot) {
+    //       if (snapshot.connectionState == ConnectionState.done) {
+    //         controller.startImageStream((CameraImage img) {
+    //           if (!isDetecting) {
+    //             isDetecting = true;
+    //             Tflite.detectObjectOnFrame(
+    //               bytesList: img.planes.map((plane) {
+    //                 return plane.bytes;
+    //               }).toList(),
+    //               model: "SSDMobileNet",
+    //               imageHeight: img.height,
+    //               imageWidth: img.width,
+    //               imageMean: 127.5,
+    //               imageStd: 127.5,
+    //               numResultsPerClass: 1,
+    //               threshold: 0.4,
+    //             ).then((recognitions) {
+    //               widget.setRecognitions(recognitions!, img.height, img.width);
+    //               print(recognitions);
+    //               isDetecting = false;
+    //             });
+    //           }
+    //         });
+    // If the Future is complete, display the preview.
     var tmp = MediaQuery.of(context).size;
     var screenH = math.max(tmp.height, tmp.width);
     var screenW = math.min(tmp.height, tmp.width);
@@ -92,5 +124,12 @@ class _CameraFeedState extends State<CameraFeed> {
           screenRatio > previewRatio ? screenH / previewH * previewW : screenW,
       child: CameraPreview(controller),
     );
+    //         } else {
+    //           return Center(
+    //               child:
+    //                   CircularProgressIndicator()); // Otherwise, display a loading indicator.
+    //         }
+    //       });
+    // }
   }
 }

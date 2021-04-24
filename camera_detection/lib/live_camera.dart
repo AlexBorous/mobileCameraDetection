@@ -1,7 +1,6 @@
 import 'package:camera/camera.dart';
 import 'package:camera_detection/camera.dart';
 import 'package:flutter/material.dart';
-import 'dart:math' as math;
 import 'package:tflite/tflite.dart';
 
 class LiveFeed extends StatefulWidget {
@@ -43,9 +42,6 @@ class _LiveFeedState extends State<LiveFeed> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Real Time Object Detection"),
-      ),
       body: Stack(
         children: <Widget>[
           CameraFeed(widget.cameras, setRecognitions),
