@@ -71,14 +71,14 @@ class _CameraFeedState extends State<CameraFeed> {
               final up = await controller.takePicture();
               print(up.path);
               print(up.name);
-              await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => DisplayPictureScreen(
-                    imagePath: up.path,
-                  ),
-                ),
-              );
+              // await Navigator.push(
+              //   context,
+              //   MaterialPageRoute(
+              //     builder: (context) => DisplayPictureScreen(
+              //       imagePath: up.path,
+              //     ),
+              //   ),
+              // );
               int? reason = await uploadImage(
                   filepath: up.path, url: widget.url, filename: up.name);
               if (reason == null) break;
