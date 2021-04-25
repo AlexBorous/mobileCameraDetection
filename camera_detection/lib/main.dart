@@ -1,12 +1,19 @@
 import 'package:camera/camera.dart';
 import 'package:camera_detection/live_camera.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 late List<CameraDescription> cameras;
-String url = "default URl";
+late String url;
+late Box box;
+late int imagesUploaded;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  await Hive.initFlutter();
+  box = await Hive.openBox('settings');
+  url = await box.get("url", defaultValue: "default URL");
+  imagesUploaded = await box.get("imagesUploaded", defaultValue: 0);
   cameras = await availableCameras();
 
   runApp(MyApp());
@@ -49,7 +56,11 @@ class _CameraAppState extends State<CameraApp> {
     print(url);
 
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
+        elevation: 0.0,
+        backgroundColor: Colors.transparent,
+        centerTitle: true,
         title: Text("Car Detector App"),
         actions: <Widget>[
           IconButton(
@@ -79,7 +90,7 @@ class _CameraAppState extends State<CameraApp> {
                             border: Border.all(width: 2, color: Colors.white)),
                         child: Center(
                           child: Text(
-                            "5",
+                            "${imagesUploaded}",
                             style: const TextStyle(fontSize: 40.0),
                           ),
                         ),
@@ -116,9 +127,7 @@ class _CameraAppState extends State<CameraApp> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => LiveFeed(
-                              cameras,
-                            ),
+                            builder: (context) => LiveFeed(cameras, url),
                           ),
                         );
                       },
@@ -150,8 +159,9 @@ class _CameraAppState extends State<CameraApp> {
               child: TextField(
                 textAlign: TextAlign.center,
                 controller: _textEditingController,
-                onSubmitted: (str) {
+                onSubmitted: (str) async {
                   url = str;
+                  await box.put("url", url);
                 },
               ),
             ),
