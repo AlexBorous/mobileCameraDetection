@@ -61,9 +61,9 @@ class _CameraFeedState extends State<CameraFeed> {
           imageStd: 127.5,
           numResultsPerClass: 2,
           threshold: 0.1,
-        ).then((recognitions) {
+        ).then((recognitions) async {
           widget.setRecognitions(recognitions!, img.height, img.width);
-          recognitions.forEach((element) async {
+          for (var element in recognitions) {
             if (element['confidenceInClass'] > 0.55 &&
                 element['detectedClass'] == "car") {
               print(element['detectedClass']);
@@ -71,32 +71,34 @@ class _CameraFeedState extends State<CameraFeed> {
               final up = await controller.takePicture();
               print(up.path);
               print(up.name);
-              // await Navigator.push(
-              //   context,
-              //   MaterialPageRoute(
-              //     builder: (context) => DisplayPictureScreen(
-              //       imagePath: up.path,
-              //     ),
-              //   ),
-              // );
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => DisplayPictureScreen(
+                    imagePath: up.path,
+                  ),
+                ),
+              );
               int? reason = await uploadImage(
                   filepath: up.path, url: widget.url, filename: up.name);
-              if (reason == null) return func();
+              if (reason == null) break;
               print(reason);
               if (reason == 200) {
+                if (!Hive.isBoxOpen("settings")) await Hive.openBox("settings");
                 int imagesUploaded =
                     Hive.box("settings").get("imagesUploaded", defaultValue: 0);
                 await Hive.box("settings")
                     .put("imagesUploaded", imagesUploaded + 1);
+                await Hive.close();
               }
-              await Future.delayed(Duration(seconds: 1));
-              func();
-              // final image = await convertImagetoPng(img);
-              // print(image!.getBytes());
-
+              break;
             }
-          });
+          }
           print(recognitions);
+          //await Future.delayed(Duration(seconds: 1));
+
+          if (!controller.value.isStreamingImages) func();
+
           isDetecting = false;
         });
       }
