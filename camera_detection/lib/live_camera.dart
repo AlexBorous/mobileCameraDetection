@@ -6,7 +6,13 @@ import 'package:tflite/tflite.dart';
 class LiveFeed extends StatefulWidget {
   final List<CameraDescription> cameras;
   final String url;
-  LiveFeed(this.cameras, this.url);
+  final int delay;
+  final double confidence;
+  LiveFeed(
+      {required this.cameras,
+      required this.url,
+      required this.delay,
+      required this.confidence});
   @override
   _LiveFeedState createState() => _LiveFeedState();
 }
@@ -51,7 +57,13 @@ class _LiveFeedState extends State<LiveFeed> {
     return Scaffold(
       body: Stack(
         children: <Widget>[
-          CameraFeed(widget.cameras, setRecognitions, widget.url),
+          CameraFeed(
+            cameras: widget.cameras,
+            setRecognitions: setRecognitions,
+            url: widget.url,
+            confidence: widget.confidence,
+            delay: widget.delay,
+          ),
         ],
       ),
     );

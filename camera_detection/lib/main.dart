@@ -1,18 +1,24 @@
 import 'package:camera/camera.dart';
 import 'package:camera_detection/live_camera.dart';
+import 'package:camera_detection/widgets/settings.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 late List<CameraDescription> cameras;
 late String url;
+late int delay;
+late double confidence;
 late Box box;
 late int imagesUploaded;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
   box = await Hive.openBox('settings');
-  url = await box.get("url", defaultValue: "default URL");
+  url = await box.get("url", defaultValue: "post URL");
+  delay = await box.get("delay", defaultValue: 0);
+  confidence = await box.get("confidence", defaultValue: 0.55);
   imagesUploaded = await box.get("imagesUploaded", defaultValue: 0);
   cameras = await availableCameras();
 
@@ -37,24 +43,21 @@ class CameraApp extends StatefulWidget {
 }
 
 class _CameraAppState extends State<CameraApp> {
-  late TextEditingController _textEditingController;
   @override
   void initState() {
     super.initState();
-
-    _textEditingController = TextEditingController(text: url);
   }
 
   @override
   void dispose() {
-    _textEditingController.dispose();
+    box.compact();
+    Hive.close();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     print(url);
-
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -64,110 +67,100 @@ class _CameraAppState extends State<CameraApp> {
         title: Text("Car Detector App"),
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.info),
+            icon: const Icon(
+              Icons.settings_outlined,
+              color: Colors.white,
+            ),
             onPressed: aboutDialog,
           ),
         ],
       ),
-      body: Container(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Column(
-                    children: [
-                      Container(
-                        width: 100.0,
-                        height: 100.0,
-                        margin: EdgeInsets.all(20),
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(100),
-                            border: Border.all(width: 2, color: Colors.white)),
-                        child: Center(
-                          child: Text(
-                            "${imagesUploaded}",
-                            style: const TextStyle(fontSize: 40.0),
-                          ),
+      body: ValueListenableBuilder(
+          valueListenable: Hive.box('settings').listenable(),
+          builder: (context, Box box, widget) {
+            return Container(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Column(
+                          children: [
+                            Container(
+                              width: 100.0,
+                              height: 100.0,
+                              margin: EdgeInsets.all(20),
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(100),
+                                  border: Border.all(
+                                      width: 2, color: Colors.white)),
+                              child: Center(
+                                child: Text(
+                                  "${box.get("imagesUploaded", defaultValue: 0)}",
+                                  style: const TextStyle(fontSize: 40.0),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 12.0,
+                            ),
+                            Text("Images upladed"),
+                          ],
                         ),
-                      ),
-                      const SizedBox(
-                        height: 12.0,
-                      ),
-                      Text("Images upladed"),
-                    ],
-                  ),
-                ],
-              ),
-              const SizedBox(
-                height: 50.0,
-              ),
-              Container(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ElevatedButton(
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 50.0,
+                    ),
+                    Container(
                       child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text("Start Detection"),
-                          const SizedBox(
-                            width: 12.0,
-                          ),
-                          const Icon(
-                            Icons.video_camera_back_outlined,
-                            color: Colors.white,
+                          ElevatedButton(
+                            child: Row(
+                              children: [
+                                Text("Start Detection"),
+                                const SizedBox(
+                                  width: 12.0,
+                                ),
+                                const Icon(
+                                  Icons.video_camera_back_outlined,
+                                  color: Colors.white,
+                                ),
+                              ],
+                            ),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => LiveFeed(
+                                    cameras: cameras,
+                                    url:
+                                        box.get("url", defaultValue: "postUrl"),
+                                    confidence: box.get("confidence",
+                                        defaultValue: 0.55),
+                                    delay: box.get("delay", defaultValue: 0),
+                                  ),
+                                ),
+                              );
+                            },
                           ),
                         ],
                       ),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => LiveFeed(cameras, url),
-                          ),
-                        );
-                      },
                     ),
                   ],
                 ),
               ),
-            ],
-          ),
-        ),
-      ),
+            );
+          }),
     );
   }
 
-  aboutDialog() {
-    showAboutDialog(
-      context: context,
-      applicationName: "Car Detector App",
-      children: <Widget>[
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text("POST url:"),
-            const SizedBox(
-              width: 20.0,
-            ),
-            Flexible(
-              child: TextField(
-                textAlign: TextAlign.center,
-                controller: _textEditingController,
-                onSubmitted: (str) async {
-                  url = str;
-                  await box.put("url", url);
-                },
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
+  aboutDialog() async {
+    await showDialog(context: context, builder: (context) => Settings());
   }
 }

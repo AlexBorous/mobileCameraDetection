@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:camera_detection/main.dart';
 import 'package:camera_detection/upload_image.dart';
 import 'package:flutter/material.dart';
 
@@ -14,7 +15,14 @@ class CameraFeed extends StatefulWidget {
   final List<CameraDescription> cameras;
   final Callback setRecognitions;
   final String url;
-  CameraFeed(this.cameras, this.setRecognitions, this.url);
+  final int delay;
+  final double confidence;
+  CameraFeed(
+      {required this.cameras,
+      required this.setRecognitions,
+      required this.url,
+      required this.delay,
+      required this.confidence});
 
   @override
   _CameraFeedState createState() => new _CameraFeedState();
@@ -64,21 +72,12 @@ class _CameraFeedState extends State<CameraFeed> {
         ).then((recognitions) async {
           widget.setRecognitions(recognitions!, img.height, img.width);
           for (var element in recognitions) {
-            if (element['confidenceInClass'] > 0.55 &&
+            if (element['confidenceInClass'] > widget.confidence &&
                 element['detectedClass'] == "car") {
               print(element['detectedClass']);
               await controller.stopImageStream();
               final up = await controller.takePicture();
-              print(up.path);
-              print(up.name);
-              // await Navigator.push(
-              //   context,
-              //   MaterialPageRoute(
-              //     builder: (context) => DisplayPictureScreen(
-              //       imagePath: up.path,
-              //     ),
-              //   ),
-              // );
+
               int? reason = await uploadImage(
                   filepath: up.path, url: widget.url, filename: up.name);
               if (reason == null) break;
@@ -95,7 +94,7 @@ class _CameraFeedState extends State<CameraFeed> {
             }
           }
           print(recognitions);
-          //await Future.delayed(Duration(seconds: 1));
+          await Future.delayed(Duration(seconds: widget.delay));
 
           if (!controller.value.isStreamingImages) func();
 
