@@ -49,17 +49,20 @@ class _SettingsState extends State<Settings> {
             children: [
               Text(
                 "POST url",
-                style: TextStyle(
+                style: const TextStyle(
                     fontWeight: FontWeight.w600,
                     fontStyle: FontStyle.italic,
-                    color: Colors.white60),
+                    color: Colors.white70),
               ),
               const SizedBox(
                 height: 8.0,
               ),
               Container(
                 child: TextField(
-                  decoration: InputDecoration(border: OutlineInputBorder()),
+                  decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12.0),
+                  )),
                   textAlign: TextAlign.center,
                   controller: _textEditingController,
                   onSubmitted: (str) async {
@@ -75,10 +78,10 @@ class _SettingsState extends State<Settings> {
               ),
               Text(
                 "Delay",
-                style: TextStyle(
+                style: const TextStyle(
                     fontWeight: FontWeight.w600,
                     fontStyle: FontStyle.italic,
-                    color: Colors.white60),
+                    color: Colors.white70),
               ),
               const SizedBox(
                 height: 8.0,
@@ -104,11 +107,11 @@ class _SettingsState extends State<Settings> {
               ),
               Flexible(
                 child: Text(
-                  "Minimum Model Detection Confidence",
-                  style: TextStyle(
+                  "Model Minimum Detection Confidence",
+                  style: const TextStyle(
                       fontWeight: FontWeight.w600,
                       fontStyle: FontStyle.italic,
-                      color: Colors.white60),
+                      color: Colors.white70),
                 ),
               ),
               const SizedBox(
