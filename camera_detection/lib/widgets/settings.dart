@@ -41,47 +41,67 @@ class _SettingsState extends State<Settings> {
             const EdgeInsets.symmetric(horizontal: 5.0, vertical: 5.0),
         backgroundColor: Colors.blueGrey.shade700,
         content: Container(
-          height: MediaQuery.of(context).size.height * 0.5,
+          height: MediaQuery.of(context).size.height * 0.6,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                "POST url",
-                style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontStyle: FontStyle.italic,
-                    color: Colors.white70),
+              Flexible(
+                child: Text(
+                  "POST url",
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontStyle: FontStyle.italic,
+                      color: Colors.white70),
+                ),
               ),
               const SizedBox(
                 height: 8.0,
               ),
               Container(
-                child: TextField(
-                  decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12.0),
-                  )),
-                  textAlign: TextAlign.center,
-                  controller: _textEditingController,
-                  onSubmitted: (str) async {
-                    await box.put("url", str);
-                    setState(() {
-                      url = str;
-                    });
-                  },
+                child: Expanded(
+                  child: TextField(
+                    decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12.0),
+                    )),
+                    textAlign: TextAlign.center,
+                    controller: _textEditingController,
+                    onSubmitted: (str) async {
+                      await box.put("url", str);
+                      setState(() {
+                        url = str;
+                      });
+                    },
+                  ),
                 ),
               ),
               const SizedBox(
-                height: 28.0,
+                height: 16.0,
               ),
-              Text(
-                "Delay",
-                style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontStyle: FontStyle.italic,
-                    color: Colors.white70),
+              Expanded(
+                child: Row(
+                  children: [
+                    IconButton(
+                      onPressed: () {},
+                      icon: const Icon(
+                        Icons.info_outline,
+                        color: Colors.white70,
+                      ),
+                      tooltip: "Delay after taking a photo",
+                    ),
+                    Flexible(
+                      child: Text(
+                        "Delay",
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontStyle: FontStyle.italic,
+                            color: Colors.white70),
+                      ),
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(
                 height: 8.0,
@@ -105,13 +125,28 @@ class _SettingsState extends State<Settings> {
               const SizedBox(
                 height: 12.0,
               ),
-              Flexible(
-                child: Text(
-                  "Model Minimum Detection Confidence",
-                  style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontStyle: FontStyle.italic,
-                      color: Colors.white70),
+              Expanded(
+                child: Row(
+                  children: [
+                    IconButton(
+                      onPressed: () {},
+                      icon: const Icon(
+                        Icons.info_outline,
+                        color: Colors.white70,
+                      ),
+                      tooltip:
+                          "Default:0.55 More confidence means slower image taking but added certainty",
+                    ),
+                    Flexible(
+                      child: Text(
+                        "Model Minimum Detection Confidence",
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontStyle: FontStyle.italic,
+                            color: Colors.white70),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(
@@ -132,7 +167,7 @@ class _SettingsState extends State<Settings> {
                 ),
               ),
               const SizedBox(
-                height: 12.0,
+                height: 2.0,
               ),
               Flexible(
                 child: Center(

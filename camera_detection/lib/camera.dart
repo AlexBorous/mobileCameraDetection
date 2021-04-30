@@ -1,10 +1,8 @@
-import 'dart:io';
-
-import 'package:camera_detection/main.dart';
 import 'package:camera_detection/upload_image.dart';
 import 'package:flutter/material.dart';
 
 import 'package:camera/camera.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hive/hive.dart';
 import 'package:tflite/tflite.dart';
 import 'dart:math' as math;
@@ -74,14 +72,22 @@ class _CameraFeedState extends State<CameraFeed> {
           for (var element in recognitions) {
             if (element['confidenceInClass'] > widget.confidence &&
                 element['detectedClass'] == "car") {
-              print(element['detectedClass']);
               await controller.stopImageStream();
               final up = await controller.takePicture();
 
               int? reason = await uploadImage(
                   filepath: up.path, url: widget.url, filename: up.name);
               if (reason == null) break;
-              print(reason);
+              if (reason == 0) {
+                await Fluttertoast.showToast(
+                    msg: "Url parse error , make sure the url is valid",
+                    toastLength: Toast.LENGTH_LONG,
+                    gravity: ToastGravity.BOTTOM,
+                    timeInSecForIosWeb: 1,
+                    backgroundColor: Colors.red,
+                    textColor: Colors.white,
+                    fontSize: 22.0);
+              }
               if (reason == 200) {
                 if (!Hive.isBoxOpen("settings")) await Hive.openBox("settings");
                 int imagesUploaded =
@@ -93,7 +99,6 @@ class _CameraFeedState extends State<CameraFeed> {
               break;
             }
           }
-          print(recognitions);
           await Future.delayed(Duration(seconds: widget.delay));
 
           if (!controller.value.isStreamingImages) func();
@@ -132,22 +137,6 @@ class _CameraFeedState extends State<CameraFeed> {
       maxWidth:
           screenRatio > previewRatio ? screenH / previewH * previewW : screenW,
       child: CameraPreview(controller),
-    );
-  }
-}
-
-class DisplayPictureScreen extends StatelessWidget {
-  final String imagePath;
-
-  const DisplayPictureScreen({required this.imagePath});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Display the Picture')),
-      // The image is stored as a file on the device. Use the `Image.file`
-      // constructor with the given path to display the image.
-      body: Image.file(File(imagePath)),
     );
   }
 }
