@@ -1,19 +1,26 @@
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 
 Future<int?> uploadImage(
     {required String filename,
     required String filepath,
     required String url}) async {
-  var uri;
-
+  Dio dio = Dio();
+  var formData = FormData.fromMap({
+    'file': await MultipartFile.fromFile(filepath, filename: filename),
+  });
   try {
-    uri = Uri.parse(url);
-  } on FormatException catch (e) {
-    print(e.toString());
+    var response = await dio.post(url, data: formData);
+    return response.statusCode;
+  } on DioError catch (e) {
+    if (e.response != null) {
+      print(e.response!.data);
+      print(e.response!.headers);
+      print(e.response!.statusMessage);
+    } else {
+      print(e.type);
+      print(e.message);
+    }
+
     return 0;
   }
-  var request = http.MultipartRequest('POST', uri);
-  request.files.add(await http.MultipartFile.fromPath(filename, filepath));
-  var res = await request.send();
-  return res.statusCode;
 }

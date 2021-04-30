@@ -79,7 +79,7 @@ class _CameraFeedState extends State<CameraFeed> {
                   filepath: up.path, url: widget.url, filename: up.name);
               if (reason == null) break;
               if (reason == 0) {
-                await Fluttertoast.showToast(
+                Fluttertoast.showToast(
                     msg: "Url parse error , make sure the url is valid",
                     toastLength: Toast.LENGTH_LONG,
                     gravity: ToastGravity.BOTTOM,
