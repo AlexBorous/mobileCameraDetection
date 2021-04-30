@@ -13,11 +13,8 @@ Future<int?> uploadImage(
     return response.statusCode;
   } on DioError catch (e) {
     if (e.response != null) {
-      print(e.response!.data);
-      print(e.response!.headers);
       print(e.response!.statusMessage);
     } else {
-      print(e.type);
       print(e.message);
     }
 
