@@ -1,7 +1,9 @@
+import 'package:camera_detection/main.dart';
 import 'package:camera_detection/upload_image.dart';
 import 'package:flutter/material.dart';
 
 import 'package:camera/camera.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hive/hive.dart';
 import 'package:tflite/tflite.dart';
@@ -33,7 +35,7 @@ class _CameraFeedState extends State<CameraFeed> {
   @override
   void initState() {
     super.initState();
-    print(widget.cameras);
+
     if (widget.cameras.length < 1) {
       print('No Cameras Found.');
     } else {
@@ -59,21 +61,22 @@ class _CameraFeedState extends State<CameraFeed> {
           bytesList: img.planes.map((plane) {
             return plane.bytes;
           }).toList(),
+          rotation: img.width <= img.height ? 90 : 270,
           model: "SSDMobileNet",
           imageHeight: img.height,
           imageWidth: img.width,
           imageMean: 127.5,
           imageStd: 127.5,
-          numResultsPerClass: 2,
+          numResultsPerClass: 5,
           threshold: 0.1,
         ).then((recognitions) async {
           widget.setRecognitions(recognitions!, img.height, img.width);
           for (var element in recognitions) {
+            if (element['detectedClass'] == "car") print(recognitions);
             if (element['confidenceInClass'] > widget.confidence &&
                 element['detectedClass'] == "car") {
               await controller.stopImageStream();
               final up = await controller.takePicture();
-
               String? reason = await uploadImage(
                   filepath: up.path, url: widget.url, filename: up.name);
               if (reason == null)
@@ -89,11 +92,11 @@ class _CameraFeedState extends State<CameraFeed> {
                 Fluttertoast.showToast(
                     msg: reason,
                     toastLength: Toast.LENGTH_LONG,
-                    gravity: ToastGravity.BOTTOM,
+                    gravity: ToastGravity.CENTER,
                     timeInSecForIosWeb: 1,
                     backgroundColor: Colors.red,
                     textColor: Colors.white,
-                    fontSize: 22.0);
+                    fontSize: 18.0);
               }
 
               break;
@@ -120,6 +123,7 @@ class _CameraFeedState extends State<CameraFeed> {
     if (!controller.value.isInitialized) {
       return Container();
     }
+    Orientation orientation = MediaQuery.of(context).orientation;
 
     // If the Future is complete, display the preview.
     var tmp = MediaQuery.of(context).size;
@@ -132,10 +136,16 @@ class _CameraFeedState extends State<CameraFeed> {
     var previewRatio = previewH / previewW;
 
     return OverflowBox(
-      maxHeight:
-          screenRatio > previewRatio ? screenH : screenW / previewW * previewH,
-      maxWidth:
-          screenRatio > previewRatio ? screenH / previewH * previewW : screenW,
+      maxHeight: orientation == Orientation.landscape
+          ? tmp.height
+          : screenRatio > previewRatio
+              ? screenH
+              : screenW / previewW * previewH,
+      maxWidth: orientation == Orientation.landscape
+          ? tmp.width
+          : screenRatio > previewRatio
+              ? screenH / previewH * previewW
+              : screenW,
       child: CameraPreview(controller),
     );
   }

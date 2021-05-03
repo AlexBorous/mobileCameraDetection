@@ -1,5 +1,6 @@
 import 'package:camera_detection/main.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class Settings extends StatefulWidget {
   @override
@@ -12,6 +13,10 @@ class _SettingsState extends State<Settings> {
   @override
   void initState() {
     super.initState();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitDown,
+      DeviceOrientation.portraitUp,
+    ]);
     _scrollController = ScrollController();
     _textEditingController = TextEditingController(text: url);
   }
@@ -21,6 +26,12 @@ class _SettingsState extends State<Settings> {
     _scrollController.dispose();
     _textEditingController.dispose();
     super.dispose();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
   }
 
   @override
@@ -142,7 +153,7 @@ class _SettingsState extends State<Settings> {
                             color: Colors.white70,
                           ),
                           tooltip:
-                              "Default:0.55 More confidence means slower image taking but added certainty",
+                              "Default:0.35 More confidence means slower image taking but added certainty",
                         ),
                         Flexible(
                           child: Text(

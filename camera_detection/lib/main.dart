@@ -12,13 +12,15 @@ late int delay;
 late double confidence;
 late Box box;
 late int imagesUploaded;
+final ValueNotifier<bool> IS_PORTRAIT = ValueNotifier<bool>(true);
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
   box = await Hive.openBox('settings');
   url = await box.get("url", defaultValue: "post URL");
   delay = await box.get("delay", defaultValue: 0);
-  confidence = await box.get("confidence", defaultValue: 0.55);
+  confidence = await box.get("confidence", defaultValue: 0.35);
   imagesUploaded = await box.get("imagesUploaded", defaultValue: 0);
   cameras = await availableCameras();
 

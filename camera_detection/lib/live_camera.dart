@@ -48,7 +48,6 @@ class _LiveFeedState extends State<LiveFeed> {
 
   @override
   void dispose() {
-    Tflite.close();
     super.dispose();
   }
 
@@ -58,8 +57,7 @@ class _LiveFeedState extends State<LiveFeed> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         leading: IconButton(
-            onPressed: () async {
-              await Tflite.close();
+            onPressed: () {
               Navigator.of(context).pop();
             },
             icon: Icon(
