@@ -55,6 +55,18 @@ class _LiveFeedState extends State<LiveFeed> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        leading: IconButton(
+            onPressed: () async {
+              await Tflite.close();
+              Navigator.of(context).pop();
+            },
+            icon: Icon(
+              Icons.arrow_back_outlined,
+              color: Colors.white,
+            )),
+      ),
       body: Stack(
         children: <Widget>[
           CameraFeed(

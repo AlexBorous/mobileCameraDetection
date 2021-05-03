@@ -134,19 +134,19 @@ class _CameraAppState extends State<CameraApp> {
                               ],
                             ),
                             onPressed: () {
-                              Navigator.pushAndRemoveUntil(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => LiveFeed(
-                                      cameras: cameras,
-                                      url: box.get("url",
-                                          defaultValue: "postUrl"),
-                                      confidence: box.get("confidence",
-                                          defaultValue: 0.55),
-                                      delay: box.get("delay", defaultValue: 0),
-                                    ),
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => LiveFeed(
+                                    cameras: cameras,
+                                    url:
+                                        box.get("url", defaultValue: "postUrl"),
+                                    confidence: box.get("confidence",
+                                        defaultValue: 0.55),
+                                    delay: box.get("delay", defaultValue: 0),
                                   ),
-                                  (route) => false);
+                                ),
+                              );
                             },
                           ),
                         ],

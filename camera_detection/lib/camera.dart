@@ -46,7 +46,6 @@ class _CameraFeedState extends State<CameraFeed> {
           return;
         }
         setState(() {});
-        controller.lockCaptureOrientation();
         func();
       });
     }
@@ -75,12 +74,20 @@ class _CameraFeedState extends State<CameraFeed> {
               await controller.stopImageStream();
               final up = await controller.takePicture();
 
-              int? reason = await uploadImage(
+              String? reason = await uploadImage(
                   filepath: up.path, url: widget.url, filename: up.name);
-              if (reason == null) break;
-              if (reason == 0) {
+              if (reason == null)
+                break;
+              else if (reason == "good") {
+                if (!Hive.isBoxOpen("settings")) await Hive.openBox("settings");
+                int imagesUploaded =
+                    Hive.box("settings").get("imagesUploaded", defaultValue: 0);
+                await Hive.box("settings")
+                    .put("imagesUploaded", imagesUploaded + 1);
+                await Hive.close();
+              } else {
                 Fluttertoast.showToast(
-                    msg: "Url parse error , make sure the url is valid",
+                    msg: reason,
                     toastLength: Toast.LENGTH_LONG,
                     gravity: ToastGravity.BOTTOM,
                     timeInSecForIosWeb: 1,
@@ -88,14 +95,7 @@ class _CameraFeedState extends State<CameraFeed> {
                     textColor: Colors.white,
                     fontSize: 22.0);
               }
-              if (reason == 200) {
-                if (!Hive.isBoxOpen("settings")) await Hive.openBox("settings");
-                int imagesUploaded =
-                    Hive.box("settings").get("imagesUploaded", defaultValue: 0);
-                await Hive.box("settings")
-                    .put("imagesUploaded", imagesUploaded + 1);
-                await Hive.close();
-              }
+
               break;
             }
           }
