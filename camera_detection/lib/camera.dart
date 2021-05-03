@@ -1,9 +1,7 @@
-import 'package:camera_detection/main.dart';
 import 'package:camera_detection/upload_image.dart';
 import 'package:flutter/material.dart';
 
 import 'package:camera/camera.dart';
-import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hive/hive.dart';
 import 'package:tflite/tflite.dart';
@@ -72,7 +70,6 @@ class _CameraFeedState extends State<CameraFeed> {
         ).then((recognitions) async {
           widget.setRecognitions(recognitions!, img.height, img.width);
           for (var element in recognitions) {
-            if (element['detectedClass'] == "car") print(recognitions);
             if (element['confidenceInClass'] > widget.confidence &&
                 element['detectedClass'] == "car") {
               await controller.stopImageStream();

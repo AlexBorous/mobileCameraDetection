@@ -12,7 +12,6 @@ late int delay;
 late double confidence;
 late Box box;
 late int imagesUploaded;
-final ValueNotifier<bool> IS_PORTRAIT = ValueNotifier<bool>(true);
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -59,7 +58,6 @@ class _CameraAppState extends State<CameraApp> {
 
   @override
   Widget build(BuildContext context) {
-    print(url);
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
